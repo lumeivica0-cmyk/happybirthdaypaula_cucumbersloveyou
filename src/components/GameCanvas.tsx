@@ -52,27 +52,41 @@ export default function GameCanvas({
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      keysRef.current[e.key.toLowerCase()] = true
-      if (e.key.toLowerCase() === 'e' && nearHotspot && !paused) {
+      const key = e.key.toLowerCase()
+      keysRef.current[key] = true
+      if (key === 'e' && nearHotspot && !paused) {
         onInteract(nearHotspot)
       }
     }
     const onKeyUp = (e: KeyboardEvent) => {
       keysRef.current[e.key.toLowerCase()] = false
     }
+    const onWindowBlur = () => {
+      keysRef.current = {}
+    }
+
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('keyup', onKeyUp)
+    window.addEventListener('blur', onWindowBlur)
     return () => {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
+      window.removeEventListener('blur', onWindowBlur)
     }
   }, [nearHotspot, onInteract, paused])
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+
+    function drawGlow(x: number, y: number, r: number, color: string) {
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, r)
+      grad.addColorStop(0, color)
+      grad.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.fillStyle = grad
+      ctx.fillRect(x - r, y - r, r * 2, r * 2)
+    }
 
     function step(ts: number) {
       if (!lastTsRef.current) lastTsRef.current = ts
@@ -147,12 +161,47 @@ export default function GameCanvas({
       const { width, height } = location
       ctx.clearRect(0, 0, width, height)
 
+      // ambient glow sources
+      ctx.save()
+      ctx.globalCompositeOperation = 'screen'
+      drawGlow(width * 0.18, 80, 120, 'rgba(255,210,140,0.18)')
+      drawGlow(width * 0.82, 68, 100, 'rgba(122,190,255,0.14)')
+      drawGlow(width * 0.5, 120, 90, 'rgba(179,134,85,0.1)')
+      ctx.restore()
+
       // floor
       const grad = ctx.createLinearGradient(0, 0, 0, height)
       grad.addColorStop(0, '#141a24')
+      grad.addColorStop(0.35, '#16202a')
       grad.addColorStop(1, '#1c2330')
       ctx.fillStyle = grad
       ctx.fillRect(0, 0, width, height)
+
+      // textured floor grid
+      ctx.save()
+      ctx.strokeStyle = 'rgba(201,168,106,0.05)'
+      ctx.lineWidth = 1
+      for (let gx = 0; gx < width; gx += 40) {
+        ctx.beginPath()
+        ctx.moveTo(gx, 40)
+        ctx.lineTo(gx, height)
+        ctx.stroke()
+      }
+      for (let gy = 40; gy < height; gy += 40) {
+        ctx.beginPath()
+        ctx.moveTo(0, gy)
+        ctx.lineTo(width, gy)
+        ctx.stroke()
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)'
+      ctx.lineWidth = 0.7
+      for (let gy = 60; gy < height; gy += 50) {
+        ctx.beginPath()
+        ctx.moveTo(8, gy)
+        ctx.lineTo(width - 12, gy + 2)
+        ctx.stroke()
+      }
+      ctx.restore()
 
       // subtle floor tiles
       ctx.strokeStyle = 'rgba(201,168,106,0.06)'
@@ -185,6 +234,12 @@ export default function GameCanvas({
         const cy = h.y + h.h / 2
         const pulse = 3 + Math.sin(performance.now() / 300 + h.x) * 2
         ctx.save()
+        ctx.globalCompositeOperation = 'lighter'
+        const glowColor = h.kind === 'puzzle' ? 'rgba(201,168,106,0.18)' : h.kind === 'exit' ? 'rgba(111,147,166,0.12)' : 'rgba(143,174,124,0.14)'
+        drawGlow(cx, cy, 28, glowColor)
+        ctx.restore()
+
+        ctx.save()
         ctx.globalAlpha = h.id === nearHotspot?.id ? 0.95 : 0.55
         ctx.fillStyle = h.kind === 'puzzle' ? '#c9a86a' : h.kind === 'exit' ? '#6f93a6' : '#8fae7c'
         ctx.beginPath()
@@ -210,6 +265,13 @@ export default function GameCanvas({
         frameRef.current,
         facingRef.current,
       )
+
+      // warm edge glow
+      ctx.save()
+      ctx.globalCompositeOperation = 'screen'
+      drawGlow(width * 0.15, height * 0.25, 90, 'rgba(255,215,165,0.12)')
+      drawGlow(width * 0.85, height * 0.22, 80, 'rgba(120,185,240,0.12)')
+      ctx.restore()
 
       // fog vignette
       const vg = ctx.createRadialGradient(width / 2, height / 2, height / 3, width / 2, height / 2, height)

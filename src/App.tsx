@@ -60,6 +60,26 @@ export default function App() {
   }, [state.location, screen])
 
   useEffect(() => {
+    if (screen !== 'game') return
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase()
+      if (key === 'j') setJournalOpen(true)
+      if (key === 'i') setInventoryOpen(true)
+
+      if (key === 'escape') {
+        if (activePuzzle) setActivePuzzle(null)
+        else if (activeDialogue) setActiveDialogue(null)
+        else if (inventoryOpen) setInventoryOpen(false)
+        else if (journalOpen) setJournalOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [screen, activeDialogue, activePuzzle, inventoryOpen, journalOpen])
+
+  useEffect(() => {
     if (state.endingReached) return
     if (gs.hasFlag('chest_solved')) {
       const t = setTimeout(() => gs.reachEnding(), 1400)
