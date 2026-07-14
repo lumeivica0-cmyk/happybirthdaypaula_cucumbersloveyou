@@ -137,7 +137,9 @@ export default function GameCanvas({
         onMove(posRef.current, facingRef.current)
       }
 
-      render(ctx)
+      if (ctx) {
+        render(ctx)
+      }
       rafRef.current = requestAnimationFrame(step)
     }
 
