@@ -8,7 +8,7 @@ export default function StartScreen({
   onContinue: () => void
 }) {
   return (
-    <div className="start-screen">
+    <div className="start-screen" tabIndex={0}>
       <div className="start-fog" />
       <h1 className="start-title">Тумани Волмур-Голлоу</h1>
       <p className="start-subtitle">Містична детективна пригода</p>
@@ -22,7 +22,8 @@ export default function StartScreen({
           {hasSave ? 'Почати заново' : 'Почати гру'}
         </button>
       </div>
-      <p className="start-hint">WASD / стрілки — рух · E — взаємодія · Дослідіть кожен куток</p>
+      <p className="start-hint">WASD / стрілки — рух · E / Enter / Space — прийняти запрошення · E — взаємодія</p>
+      <p className="start-hint-secondary">Натисни будь-яку з клавіш, щоб почати.</p>
     </div>
   )
 }

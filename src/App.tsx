@@ -34,6 +34,12 @@ export default function App() {
   const gs = useGameState()
   const { state } = gs
 
+  useEffect(() => {
+    const body = document.body as HTMLElement
+    if (body && body.tabIndex !== 0) body.tabIndex = 0
+    body.focus()
+  }, [])
+
   const [screen, setScreen] = useState<'start' | 'game'>('start')
   const [journalOpen, setJournalOpen] = useState(false)
   const [inventoryOpen, setInventoryOpen] = useState(false)
@@ -78,6 +84,35 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [screen, activeDialogue, activePuzzle, inventoryOpen, journalOpen])
+
+  useEffect(() => {
+    if (screen !== 'start') return
+
+    const onStartPress = (e: KeyboardEvent) => {
+      const code = e.code || e.key
+      const key = e.key?.toLowerCase()
+      const accept =
+        code === 'KeyE' ||
+        code === 'KeyT' ||
+        code === 'Enter' ||
+        code === 'NumpadEnter' ||
+        code === 'Space' ||
+        key === 'e' ||
+        key === 'є' ||
+        key === ' '
+      if (!accept) return
+      e.preventDefault()
+      if (hasExistingSave) {
+        setScreen('game')
+      } else {
+        gs.resetGame()
+        setScreen('game')
+      }
+    }
+
+    window.addEventListener('keydown', onStartPress)
+    return () => window.removeEventListener('keydown', onStartPress)
+  }, [screen, hasExistingSave, gs])
 
   useEffect(() => {
     if (state.endingReached) return
