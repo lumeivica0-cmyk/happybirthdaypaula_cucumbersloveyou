@@ -123,6 +123,12 @@ export function drawCharacter(
   // ----- torso -----
   px(ctx, left + 0.5 * w, bodyTop + 9 * w, 6 * w, 6 * w, p.outfitPrimary)
   px(ctx, left + 0.5 * w, bodyTop + 13.5 * w, 6 * w, 1.5 * w, p.outfitPrimaryShadow)
+  px(ctx, left + 2.3 * w, bodyTop + 10.8 * w, 2.4 * w, 0.9 * w, 'rgba(255,255,255,0.1)')
+  px(ctx, left + 1.5 * w, bodyTop + 12 * w, 4.8 * w, 0.9 * w, 'rgba(0,0,0,0.08)')
+
+  // waist detail
+  px(ctx, left + 1.4 * w, bodyTop + 12.5 * w, 4.2 * w, 0.8 * w, p.outfitSecondary)
+  px(ctx, left + 1.4 * w, bodyTop + 13.2 * w, 4.2 * w, 0.6 * w, p.outfitSecondaryShadow)
 
   // outfit details
   if (character === 'vika') {
@@ -178,8 +184,13 @@ export function drawCharacter(
     // eyes
     px(ctx, left + 2.2 * w, headTop + 4 * w, 0.7 * w, 0.9 * w, '#241a14')
     px(ctx, left + 4.3 * w, headTop + 4 * w, 0.7 * w, 0.9 * w, '#241a14')
+    px(ctx, left + 3.2 * w, headTop + 5.6 * w, 1.6 * w, 0.4 * w, '#7f5f47')
+    // mouth
+    px(ctx, left + 2.8 * w, headTop + 6.2 * w, 1.4 * w, 0.4 * w, '#8a4330')
     // hair top / bangs
     px(ctx, left + 0.8 * w, headTop, 5.4 * w, 2.2 * w, p.hair)
+    px(ctx, left + 1.4 * w, headTop + 1 * w, 1.4 * w, 0.7 * w, 'rgba(255,255,255,0.08)')
+    px(ctx, left + 3.0 * w, headTop + 0.8 * w, 1.8 * w, 0.6 * w, 'rgba(255,255,255,0.08)')
     if (character === 'andriy') {
       px(ctx, left + 1.2 * w, headTop + 1.6 * w, 4.6 * w, 1 * w, p.hair)
     } else {

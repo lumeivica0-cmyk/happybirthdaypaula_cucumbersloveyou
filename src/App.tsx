@@ -63,11 +63,11 @@ export default function App() {
     if (screen !== 'game') return
 
     const onKeyDown = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase()
-      if (key === 'j') setJournalOpen(true)
-      if (key === 'i') setInventoryOpen(true)
+      const code = e.code || e.key
+      if (code === 'KeyJ' || code === 'j') setJournalOpen(true)
+      if (code === 'KeyI' || code === 'i') setInventoryOpen(true)
 
-      if (key === 'escape') {
+      if (code === 'Escape' || code === 'Esc' || code === 'Escape') {
         if (activePuzzle) setActivePuzzle(null)
         else if (activeDialogue) setActiveDialogue(null)
         else if (inventoryOpen) setInventoryOpen(false)

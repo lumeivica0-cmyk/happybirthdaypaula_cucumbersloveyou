@@ -52,14 +52,15 @@ export default function GameCanvas({
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase()
-      keysRef.current[key] = true
-      if (key === 'e' && nearHotspot && !paused) {
+      const code = e.code || e.key
+      keysRef.current[code] = true
+      if ((code === 'KeyE' || code === 'KeyX' || code === 'Enter' || code === 'Space') && nearHotspot && !paused) {
         onInteract(nearHotspot)
       }
     }
     const onKeyUp = (e: KeyboardEvent) => {
-      keysRef.current[e.key.toLowerCase()] = false
+      const code = e.code || e.key
+      keysRef.current[code] = false
     }
     const onWindowBlur = () => {
       keysRef.current = {}
@@ -97,10 +98,15 @@ export default function GameCanvas({
         const k = keysRef.current
         let dx = 0
         let dy = 0
-        if (k['arrowup'] || k['w']) dy -= 1
-        if (k['arrowdown'] || k['s']) dy += 1
-        if (k['arrowleft'] || k['a']) dx -= 1
-        if (k['arrowright'] || k['d']) dx += 1
+        const up = k['ArrowUp'] || k['KeyW'] || k['KeyZ']
+        const down = k['ArrowDown'] || k['KeyS'] || k['KeyX']
+        const left = k['ArrowLeft'] || k['KeyA'] || k['KeyQ']
+        const right = k['ArrowRight'] || k['KeyD'] || k['KeyE']
+
+        if (up) dy -= 1
+        if (down) dy += 1
+        if (left) dx -= 1
+        if (right) dx += 1
 
         const moving = dx !== 0 || dy !== 0
         if (moving) {
@@ -193,14 +199,23 @@ export default function GameCanvas({
         ctx.lineTo(width, gy)
         ctx.stroke()
       }
-      ctx.strokeStyle = 'rgba(255,255,255,0.04)'
-      ctx.lineWidth = 0.7
-      for (let gy = 60; gy < height; gy += 50) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+      ctx.lineWidth = 0.6
+      for (let gy = 55; gy < height; gy += 48) {
         ctx.beginPath()
         ctx.moveTo(8, gy)
-        ctx.lineTo(width - 12, gy + 2)
+        ctx.lineTo(width - 12, gy + 3)
         ctx.stroke()
       }
+      ctx.restore()
+
+      // subtle floor reflections
+      ctx.save()
+      ctx.globalCompositeOperation = 'lighter'
+      ctx.fillStyle = 'rgba(255, 215, 165, 0.02)'
+      ctx.fillRect(42, height - 180, width * 0.25, 80)
+      ctx.fillStyle = 'rgba(120, 185, 240, 0.02)'
+      ctx.fillRect(width - 220, height - 160, 180, 70)
       ctx.restore()
 
       // subtle floor tiles
